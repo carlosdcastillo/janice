@@ -25,7 +25,7 @@ if (${JANICE_WITH_EVAL_HARNESS} AND (JANICE_IO_IMPLEMENTATION) AND (JANICE_IMPLE
     # get the name to use for the executable
     get_filename_component(UTIL_NAME ${HARNESS} NAME_WE)
     add_executable(${UTIL_NAME} ${HARNESS})
-    target_link_libraries(${UTIL_NAME} ${JANICE_IO_IMPLEMENTATION} ${JANICE_IMPLEMENTATION})
+    target_link_libraries(${UTIL_NAME} ${JANICE_IO_IMPLEMENTATION} ${JANICE_IMPLEMENTATION} pthread)
     # If this is defined, it's an installation path.
     if (DEFINED JANICE_EVAL_HARNESS_INSTALL)
       install(TARGETS ${UTIL_NAME} RUNTIME DESTINATION ${JANICE_EVAL_HARNESS_INSTALL})
