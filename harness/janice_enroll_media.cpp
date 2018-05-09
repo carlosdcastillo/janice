@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
         int sighting_id;
         while (metadata.read_row(filename, sighting_id)) {
             sighting_id_filename_lut[sighting_id].push_back(args::get(media_path) + "/" + filename);
-            std::cout << "image file name: " << args::get(media_path) + "/" + filename;
+            std::cout << "image file name: " << args::get(media_path) + "/" + filename << std::endl;
         }
     }
 
