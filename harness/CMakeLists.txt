@@ -4,6 +4,9 @@ if (${JANICE_WITH_EVAL_HARNESS} AND (JANICE_IO_IMPLEMENTATION) AND (JANICE_IMPLE
   # Use C++11
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
+  SET(OPENCV_TARGET_VERSION 3.2)
+  FIND_PACKAGE(OpenCV ${OPENCV_TARGET_VERSION} EXACT)
+  include_directories(${OpenCV_INCLUDE_DIRS})
   # Include paths. By default we include the opencv_io implementation
   include_directories(../implementations/opencv_io)
   include_directories(include)
@@ -24,8 +27,8 @@ if (${JANICE_WITH_EVAL_HARNESS} AND (JANICE_IO_IMPLEMENTATION) AND (JANICE_IMPLE
   foreach(HARNESS ${HARNESS_SOURCES})
     # get the name to use for the executable
     get_filename_component(UTIL_NAME ${HARNESS} NAME_WE)
-    add_executable(${UTIL_NAME} ${HARNESS})
-    target_link_libraries(${UTIL_NAME} ${JANICE_IO_IMPLEMENTATION} ${JANICE_IMPLEMENTATION} pthread)
+    add_executable(${UTIL_NAME} ${HARNESS} janice_io_opencv_frommat.cpp)
+    target_link_libraries(${UTIL_NAME} ${JANICE_IO_IMPLEMENTATION} ${JANICE_IMPLEMENTATION} ${OpenCV_LIBS} pthread)
     # If this is defined, it's an installation path.
     if (DEFINED JANICE_EVAL_HARNESS_INSTALL)
       install(TARGETS ${UTIL_NAME} RUNTIME DESTINATION ${JANICE_EVAL_HARNESS_INSTALL})

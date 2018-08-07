@@ -4,6 +4,7 @@
 
 #include <arg_parser/args.hpp>
 #include <fast-cpp-csv-parser/csv.h>
+#include "janice_io_opencv_frommat.h"
 
 #include <iostream>
 #include <chrono>
@@ -81,8 +82,9 @@ int main(int argc, char* argv[])
         std::string filename;
         while (metadata.read_row(filename)) {
             JaniceMediaIterator it;
-            JANICE_ASSERT(janice_io_opencv_create_media_iterator((args::get(media_path) + "/" + filename).c_str(), &it));
-
+            cv::Mat im = cv::imread((args::get(media_path) + "/" + filename), CV_LOAD_IMAGE_COLOR);
+            //JANICE_ASSERT(janice_io_opencv_create_media_iterator((args::get(media_path) + "/" + filename).c_str(), &it));
+            JANICE_ASSERT(janice_io_opencv_create_frommat(im, &it));
             filenames.push_back(filename);
             media.push_back(it);
         }
