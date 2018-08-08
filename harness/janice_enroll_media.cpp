@@ -4,6 +4,7 @@
 
 #include <arg_parser/args.hpp>
 #include <fast-cpp-csv-parser/csv.h>
+#include "janice_io_opencv_frommat.h"
 
 #include <iostream>
 #include <cstring>
@@ -110,14 +111,20 @@ int main(int argc, char* argv[])
     for (auto entry : sighting_id_filename_lut) {
         JaniceMediaIterator it;
         if (entry.second.size() == 1) {
-            JANICE_ASSERT(janice_io_opencv_create_media_iterator(entry.second[0].c_str(), &it));
+            //JANICE_ASSERT(janice_io_opencv_create_media_iterator(entry.second[0].c_str(), &it));
+
+            cv::Mat im = cv::imread(entry.second[0], CV_LOAD_IMAGE_COLOR);
+            JANICE_ASSERT(janice_io_opencv_create_frommat(im, &it));
         } else {
             const char** filenames = new const char*[entry.second.size()];
             for (size_t i = 0; i < entry.second.size(); ++i) {
                 filenames[i] = entry.second[i].c_str();
             }
 
-            JANICE_ASSERT(janice_io_opencv_create_sparse_media_iterator(filenames, entry.second.size(), &it));
+            //JANICE_ASSERT(janice_io_opencv_create_sparse_media_iterator(filenames, entry.second.size(), &it));
+
+            cv::Mat im = cv::imread(entry.second[0], CV_LOAD_IMAGE_COLOR);
+            JANICE_ASSERT(janice_io_opencv_create_frommat(im, &it));
 
             delete[] filenames;
         }

@@ -28,6 +28,25 @@ static inline JaniceError cv_mat_to_janice_image(cv::Mat& m, JaniceImage* _image
     return JANICE_SUCCESS;
 }
 
+static inline JaniceError copy_janice_image(JaniceImage im, JaniceImage* _image){
+    // Allocate a new image
+    JaniceImage image = new JaniceImageType();
+
+    // Set up the dimensions
+    image->channels = im->channels;
+    image->rows = im->rows;
+    image->cols = im->cols;
+
+    image->data = (uint8_t*) malloc(im->channels * im->rows * im->cols);
+    memcpy(image->data, im->data, im->channels * im->rows * im->cols);
+    image->owner = true;
+
+    *_image = image;
+
+    return JANICE_SUCCESS;
+
+}
+
 // ----------------------------------------------------------------------------
 // JaniceMediaIterator
 
@@ -56,7 +75,8 @@ JaniceError next(JaniceMediaIterator it, JaniceImage* image)
         return JANICE_MEDIA_AT_END;
 
     try {
-        *image = state->images[state->pos];
+        copy_janice_image(state->images[state->pos], image);
+        //*image = state->images[state->pos];
     } catch (...) {
         return JANICE_UNKNOWN_ERROR;
     }
@@ -118,7 +138,11 @@ JaniceError free_image(JaniceImage* image)
 JaniceError free_iterator(JaniceMediaIterator* it)
 {
     if (it && (*it)->_internal) {
-        delete (JaniceMediaIteratorStateTypeFM*) (*it)->_internal;
+        JaniceMediaIteratorStateTypeFM* state = (JaniceMediaIteratorStateTypeFM*) (*it)->_internal;
+        for (auto im : state->images){
+            free_image(&im);
+        }
+        delete(JaniceMediaIteratorStateTypeFM*) (*it)->_internal; 
         delete (*it);
         *it = nullptr;
     }
