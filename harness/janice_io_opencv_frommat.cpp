@@ -106,7 +106,8 @@ JaniceError get(JaniceMediaIterator it, JaniceImage* image, uint32_t frame)
         return JANICE_BAD_ARGUMENT;
 
     try {
-        *image = state->images[frame];
+        //*image = state->images[frame];
+        copy_janice_image(state->images[state->pos], image);
     } catch (...) {
         return JANICE_UNKNOWN_ERROR;
     }
@@ -163,7 +164,7 @@ JaniceError reset(JaniceMediaIterator it)
 // ----------------------------------------------------------------------------
 // OpenCV I/O only, create a from cv::Mat opencv_io media iterator
 
-JaniceError janice_io_opencv_create_frommat(cv::Mat im, JaniceMediaIterator *_it)
+JaniceError janice_io_opencv_create_frommat(std::vector<cv::Mat> ims, JaniceMediaIterator *_it)
 {
     JaniceMediaIterator it = new JaniceMediaIteratorType();
 
@@ -181,9 +182,11 @@ JaniceError janice_io_opencv_create_frommat(cv::Mat im, JaniceMediaIterator *_it
     it->reset      = &reset;
 
     JaniceMediaIteratorStateTypeFM* state = new JaniceMediaIteratorStateTypeFM();
-    JaniceImage jim;
-    cv_mat_to_janice_image(im, &jim);
-    state->images.push_back(jim);
+    for (auto im : ims){
+        JaniceImage jim;
+        cv_mat_to_janice_image(im, &jim);
+        state->images.push_back(jim);
+    }
     state->pos = 0;
 
     it->_internal = (void*) (state);

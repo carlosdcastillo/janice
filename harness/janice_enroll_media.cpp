@@ -116,17 +116,17 @@ int main(int argc, char* argv[])
             cv::Mat im = cv::imread(entry.second[0], CV_LOAD_IMAGE_COLOR);
             JANICE_ASSERT(janice_io_opencv_create_frommat(im, &it));
         } else {
-            const char** filenames = new const char*[entry.second.size()];
+            std::vector<cv::Mat> ims;
             for (size_t i = 0; i < entry.second.size(); ++i) {
-                filenames[i] = entry.second[i].c_str();
+                cv::Mat im = cv::imread(entry.second[i], CV_LOAD_IMAGE_COLOR);
+                ims.push_back(im);
+
             }
 
             //JANICE_ASSERT(janice_io_opencv_create_sparse_media_iterator(filenames, entry.second.size(), &it));
 
-            cv::Mat im = cv::imread(entry.second[0], CV_LOAD_IMAGE_COLOR);
-            JANICE_ASSERT(janice_io_opencv_create_frommat(im, &it));
+            JANICE_ASSERT(janice_io_opencv_create_frommat(ims, &it));
 
-            delete[] filenames;
         }
 
         first_filenames.push_back(entry.second[0]);

@@ -4,6 +4,7 @@
 
 #include <arg_parser/args.hpp>
 #include <fast-cpp-csv-parser/csv.h>
+#include "janice_io_opencv_frommat.h"
 
 #include <unordered_map>
 #include <iostream>
@@ -110,12 +111,16 @@ int main(int argc, char* argv[])
             JaniceDetection detection;
 
             if (entry.second.size() == 1) {
-                JANICE_ASSERT(janice_io_opencv_create_media_iterator(entry.second[0].first.c_str(), &it));
+                std::vector<cv::Mat> ims;
+                cv::Mat im = cv::imread(entry.second[0].first, CV_LOAD_IMAGE_COLOR);
+                ims.push_back(im);
+                JANICE_ASSERT(janice_io_opencv_create_frommat(ims, &it));
                 JANICE_ASSERT(janice_create_detection_from_rect(it, entry.second[0].second, 0, &detection));
                 JANICE_ASSERT(it->reset(it));
             } else {
                 const char** filenames = new const char*[entry.second.size()];
 
+                std::vector<cv::Mat> ims;
                 JaniceTrack track;
                 track.rects = new JaniceRect[entry.second.size()];
                 track.confidences = new float[entry.second.size()];
@@ -123,14 +128,15 @@ int main(int argc, char* argv[])
                 track.length = entry.second.size();
 
                 for (size_t i = 0; i < entry.second.size(); ++i) {
-                    filenames[i] = entry.second[i].first.c_str();
+                    cv::Mat im = cv::imread(entry.second[i].first, CV_LOAD_IMAGE_COLOR);
+                    ims.push_back(im);
 
                     track.rects[i] = entry.second[i].second;
                     track.confidences[i] = 1.0;
                     track.frames[i] = i;
                 }
 
-                JANICE_ASSERT(janice_io_opencv_create_sparse_media_iterator(filenames, track.length, &it));
+                JANICE_ASSERT(janice_io_opencv_create_frommat(ims, &it));
                 JANICE_ASSERT(janice_create_detection_from_track(it, track, &detection));
                 JANICE_ASSERT(it->reset(it));
 

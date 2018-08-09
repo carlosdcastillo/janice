@@ -84,7 +84,9 @@ int main(int argc, char* argv[])
             JaniceMediaIterator it;
             cv::Mat im = cv::imread((args::get(media_path) + "/" + filename), CV_LOAD_IMAGE_COLOR);
             //JANICE_ASSERT(janice_io_opencv_create_media_iterator((args::get(media_path) + "/" + filename).c_str(), &it));
-            JANICE_ASSERT(janice_io_opencv_create_frommat(im, &it));
+            std::vector<cv::Mat> ims;
+            ims.push_back(im);
+            JANICE_ASSERT(janice_io_opencv_create_frommat(ims, &it));
             filenames.push_back(filename);
             media.push_back(it);
         }
